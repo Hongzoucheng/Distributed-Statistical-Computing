@@ -49,39 +49,39 @@
 glm()函数,选择参数中的“family”为泊松回归
 
 
-```
-#! /usr/bin/env Rscript
-a = read.csv("poisson.csv", header = T)
-names(a) = c("Y", "X1", "X2", "X3", "X4")
-a[c(1:5), ]
-N = sapply(a, length)
-MU = sapply(a, mean)
-SD = sapply(a, sd)
-MIN = sapply(a, min)
-MED = sapply(a, median)
-MAX = sapply(a, max)
-result = cbind(N, MU, SD, MIN, MED, MAX)
-print(result)
-pos1 = glm(Y ~ X1 + X2 + X3 + X4, family = poisson(), data = a)
-summary(pos1)
-step(pos1)
-pred = predict(pos1, a)
-lam = exp(pred)RME = abs(a$Y - lam) / (1 + lam)
-summary(RME)
-```
+
+	#! /usr/bin/env Rscript
+	a = read.csv("poisson.csv", header = T)
+	names(a) = c("Y", "X1", "X2", "X3", "X4")
+	a[c(1:5), ]
+	N = sapply(a, length)
+	MU = sapply(a, mean)
+	SD = sapply(a, sd)
+	MIN = sapply(a, min)
+	MED = sapply(a, median)
+	MAX = sapply(a, max)
+	result = cbind(N, MU, SD, MIN, MED, MAX)
+	print(result)
+	pos1 = glm(Y ~ X1 + X2 + X3 + X4, family = poisson(), data = a)
+	summary(pos1)
+	step(pos1)
+	pred = predict(pos1, a)
+	lam = exp(pred)RME = abs(a$Y - lam) / (1 + lam)
+	summary(RME)
+	
 
 
 
 得到相应的分析结果如下
 
-```
-               Coefficients Std. error    P-value
-(Intercept)           1.576     0.393     <0.001
-X1 - 关键词长度      -0.531     0.086     <0.001
-X2 - 展现量           0.002     0.001     <0.001
-X3 - 平均点击价格     0.024     0.003     <0.001
-X4 - 平均排名        -0.109     0.080     0.176
-```
+
+	               Coefficients Std. error    P-value
+	(Intercept)           1.576     0.393     <0.001
+	X1 - 关键词长度      -0.531     0.086     <0.001
+	X2 - 展现量           0.002     0.001     <0.001
+	X3 - 平均点击价格     0.024     0.003     <0.001
+	X4 - 平均排名        -0.109     0.080     0.176
+
 
 首先注意到,最后一个解释变量 X4 平均排名在 5%的水平下不显著。这就是说,在控制其他变量的前提
 下,平均排名的高低和点击量并没有线性关系。出现这种结果的原因很有可能是因为它的信息被别的变
@@ -107,19 +107,19 @@ X4 - 平均排名        -0.109     0.080     0.176
 的,且使分块运算结果没有系统上的差异。
 
 
-```
-#! /usr/bin/env Rscript
-input = file("stdin", "r")
-poi = readLines(input, warn = F)
-poi = matrix(as.numeric(unlist(strsplit(poi, ","))), ncol = 5, byrow = T)
-poi = data.frame(poi)
-n = dim(poi)[1]
-set.seed(1)
-sam = sample(n)
-poi = poi[sam, ]
-write.csv(poi, "poisson2.csv")
-close(input)
-```
+
+	#! /usr/bin/env Rscript
+	input = file("stdin", "r")
+	poi = readLines(input, warn = F)
+	poi = matrix(as.numeric(unlist(strsplit(poi, ","))), ncol = 5, byrow = T)
+	poi = data.frame(poi)
+	n = dim(poi)[1]
+	set.seed(1)
+	sam = sample(n)
+	poi = poi[sam, ]
+	write.csv(poi, "poisson2.csv")
+	close(input)
+
 
 
 接下来我们对新数据执行 MapReduce 并行计算。该并行过程是通过 mapper函数和 reducer 函数来实
@@ -135,31 +135,31 @@ mapper 函数将随机排序后的数据分成 4 块,每块包含 200 个观测�
 glm()函数,选择参数中的“family”为泊松回归,执行出的结果中共有四组回归系数、p 值及相对预测误
 差(RME)
 
-```
-#! /usr/bin/env Rscript
-input = file("stdin", "r")
-test = readLines(input, n=1, warn=F)
-p = length((unlist(strsplit(test, ","))))
-                                        # 求出数据中的变量个数 p
-while(length(data <- readLines(input, n = 200, warn = F)) > 0)
-                                        # 每 200 行数据为一个分块
-{
-    a = data.frame(matrix(as.numeric(unlist(strsplit(data, ","))), ncol = p, byrow = T))
-    names(a) = c("NUM", "Y", "X1", "X2", "X3", "X4")
-    glm = glm(Y~X1+X2+X3+X4, family = poisson(), data = a)
-    coefficients = glm$coefficients # 回归系数
-    pvalue = summary(glm)$coefficients[, 4] # p 值
-    pred = predict(glm, a)
-    lam = exp(pred)
-    RME = abs(a$Y - lam) / (1+lam)
-    mean = mean(RME)
-                                        # 相对预测误差
-    cat(coefficients, '\n')
-    cat(pvalue, '\n')
-    cat(mean, '\n')
-}
-close(input)
-```
+
+	#! /usr/bin/env Rscript
+	input = file("stdin", "r")
+	test = readLines(input, n=1, warn=F)
+	p = length((unlist(strsplit(test, ","))))
+	                                        # 求出数据中的变量个数 p
+	while(length(data <- readLines(input, n = 200, warn = F)) > 0)
+	                                        # 每 200 行数据为一个分块
+	{
+	    a = data.frame(matrix(as.numeric(unlist(strsplit(data, ","))), ncol = p, byrow = T))
+	    names(a) = c("NUM", "Y", "X1", "X2", "X3", "X4")
+	    glm = glm(Y~X1+X2+X3+X4, family = poisson(), data = a)
+	    coefficients = glm$coefficients # 回归系数
+	    pvalue = summary(glm)$coefficients[, 4] # p 值
+	    pred = predict(glm, a)
+	    lam = exp(pred)
+	    RME = abs(a$Y - lam) / (1+lam)
+	    mean = mean(RME)
+	                                        # 相对预测误差
+	    cat(coefficients, '\n')
+	    cat(pvalue, '\n')
+	    cat(mean, '\n')
+	}
+	close(input)
+
 
 可以看到,四个分块中的运行结果是有差异的,如第一块中 X2 的系数变为了负值,第三块中 X1 的 p 值
 明显偏大导致不显著等。这可能是由于数据量太小,且因变量分布非常不均,大部分取值都为零,仅有小
@@ -177,37 +177,37 @@ reducer 函数的主要功能是归约,即对映射后的结果进行合并整�
 数的方法进行分类,从而分别对系数、p 值、预测误差求得平均值。最终的执行结果如下表所示。
 
 
-```
-#! /usr/bin/env Rscript
-input = file("stdin", "r")
-i = 0
-coefficients = rep(0,5)
-pvalue = rep(0,5)
-mean = 0
-while(length(mapresult <- readLines(input, n = 1, warn = F)) > 0)
-{
-    i = i+1
-    fields = strsplit(mapresult, ' ')
-    if (i%%3 == 1) {
-        coefficients = coefficients + as.numeric(fields[[1]]) # 对 1、4、7、10 行的系数求和
-    }
-    else if (i%%3 == 2) {
-        pvalue = pvalue + as.numeric(fields[[1]])
-                                        # 对 2、5、8、11 行的 p 值求和
-    }
-    else if (i%%3 == 0) {
-        mean = mean + as.numeric(fields[[1]])
-                                        # 对 3、6、9、12 行的误差求和
-    }
-}
-coefficients = coefficients/(i/3)
-pvalue = pvalue/(i/3)
-mean = mean/(i/3)
-cat('coefficients =', coefficients, '\n')
-cat('pvalue =', pvalue, '\n')
-cat('RME =', mean, '\n')
-close(input)
-```
+
+	#! /usr/bin/env Rscript
+	input = file("stdin", "r")
+	i = 0
+	coefficients = rep(0,5)
+	pvalue = rep(0,5)
+	mean = 0
+	while(length(mapresult <- readLines(input, n = 1, warn = F)) > 0)
+	{
+	    i = i+1
+	    fields = strsplit(mapresult, ' ')
+	    if (i%%3 == 1) {
+	        coefficients = coefficients + as.numeric(fields[[1]]) # 对 1、4、7、10 行的系数求和
+	    }
+	    else if (i%%3 == 2) {
+	        pvalue = pvalue + as.numeric(fields[[1]])
+	                                        # 对 2、5、8、11 行的 p 值求和
+	    }
+	    else if (i%%3 == 0) {
+	        mean = mean + as.numeric(fields[[1]])
+	                                        # 对 3、6、9、12 行的误差求和
+	    }
+	}
+	coefficients = coefficients/(i/3)
+	pvalue = pvalue/(i/3)
+	mean = mean/(i/3)
+	cat('coefficients =', coefficients, '\n')
+	cat('pvalue =', pvalue, '\n')
+	cat('RME =', mean, '\n')
+	close(input)
+
 
 
 ### 与全数据模型比较

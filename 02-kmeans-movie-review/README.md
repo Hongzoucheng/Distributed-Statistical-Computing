@@ -74,42 +74,42 @@ Reducer。
 Hadoop的MapReduce技术，Mapper主要用于实现读取数据完输入数据并完成数据分割后开始运行。每个
 分割后的切片数据都会以键值对数据进行输出。
 
-```
-#! /usr/bin/env Rscript
 
-input <- file("stdin","r")
+	#! /usr/bin/env Rscript
+	
+	input <- file("stdin","r")
+	
+	A<-c()
+	B<-c()
+	
+	while(length(currentLine <- readLines(input,n=1,warn=FALSE))>0)
+	{
+	    fields <- unlist(strsplit(currentLine,","))
+	    a=as.double(fields[1])
+	    b=as.double(fields[2])
+	    A=c(A,a)
+	    B=c(B,b)
+	}
+	mydata <- data.frame(A,B)
+	
+	scale01=function(x){
+	    ncol=dim(x)[2]
+	    nrow=dim(x)[1]
+	    new=matrix(0,nrow,ncol)
+	    for(i in 1:ncol)
+	    {max=max(x[,i])
+	        min=min(x[,i])
+	        for(j in 1:nrow)
+	        {new[j,i]=(x[j,i]-min)/(max-min)}
+	    }
+	    new
+	}
+	
+	datanorm=scale01(mydata)
+	print(datanorm,stdout())
+	close(input)
 
-A<-c()
-B<-c()
 
-while(length(currentLine <- readLines(input,n=1,warn=FALSE))>0)
-{
-    fields <- unlist(strsplit(currentLine,","))
-    a=as.double(fields[1])
-    b=as.double(fields[2])
-    A=c(A,a)
-    B=c(B,b)
-}
-mydata <- data.frame(A,B)
-
-scale01=function(x){
-    ncol=dim(x)[2]
-    nrow=dim(x)[1]
-    new=matrix(0,nrow,ncol)
-    for(i in 1:ncol)
-    {max=max(x[,i])
-        min=min(x[,i])
-        for(j in 1:nrow)
-        {new[j,i]=(x[j,i]-min)/(max-min)}
-    }
-    new
-}
-
-datanorm=scale01(mydata)
-print(datanorm,stdout())
-close(input)
-
-```
 
 
 而Reducer在接收Map阶段的输出数据，该数据以键为基础进行分组。Reducer用于对数据进行聚集，接
@@ -119,31 +119,31 @@ close(input)
 在R版本的Reducer中引入R包e1071，利用cmeans函数分析数据，将其进行K均值聚类分析。将聚类数目
 设置为4，迭代数目设为20次。
 
-```
-#! /usr/bin/env Rscript
+	
+	#! /usr/bin/env Rscript
+	
+	input <- file("stdin","r")
+	A<-c()
+	B<-c()
+	while(length(currentLine<-readLines(input,n=1,warn=FALSE))>0)
+	{
+	    fields=unlist(strsplit(currentLine," "))
+	    a=as.double(fields[2])
+	    b=as.double(fields[3])
+	    A=c(A,a)
+	    B=c(B,b)
+	}
+	
+	mydata=data.frame(A,B)
+	mydata=na.omit(mydata)
+	data=as.matrix(mydata)
+	
+	library(e1071)
+	results=cmeans(data,centers=4,iter.max=20,verbose=TRUE,method="cmeans",m=2)
+	print(results)
+	
+	close(input)
 
-input <- file("stdin","r")
-A<-c()
-B<-c()
-while(length(currentLine<-readLines(input,n=1,warn=FALSE))>0)
-{
-    fields=unlist(strsplit(currentLine," "))
-    a=as.double(fields[2])
-    b=as.double(fields[3])
-    A=c(A,a)
-    B=c(B,b)
-}
-
-mydata=data.frame(A,B)
-mydata=na.omit(mydata)
-data=as.matrix(mydata)
-
-library(e1071)
-results=cmeans(data,centers=4,iter.max=20,verbose=TRUE,method="cmeans",m=2)
-print(results)
-
-close(input)
-```
 
 
 在Python版本Reducer的该函数为给定数据集构建一个包含K个随机质心的集合，随机质心必须要在整个
@@ -151,40 +151,40 @@ close(input)
 数，并通过取值范围和最小值，以便确保随机点在数据的边界之内：
 
 
-```
-def randCent(dataSet, k):
-      n = shape(dataSet)[1]
-      centroids = mat(np.zeros((k,n)))
-      for j  in range(n):
-           minJ = min(dataSet[:, j])
-           rangeJ = float(max(dataSet[:,j]) - minJ)
-           centroids[:,j] = minJ + rangeJ * random.rand(k, 1)
-      return centroids
-```
+
+	def randCent(dataSet, k):
+	      n = shape(dataSet)[1]
+	      centroids = mat(np.zeros((k,n)))
+	      for j  in range(n):
+	           minJ = min(dataSet[:, j])
+	           rangeJ = float(max(dataSet[:,j]) - minJ)
+	           centroids[:,j] = minJ + rangeJ * random.rand(k, 1)
+	      return centroids
+
 
 最后定义K均值算法的函数。一开始确定数据集中数据点的总数，然后创建一个矩阵来储存每个点的簇分配结果。簇分类结果有两列。一列记录簇的索引值，第二列储存误差。这里的误差指的是当前点到簇质心的距离。按照此种方式，反复迭代，知道所有数据点的簇分配结果不会改变为止。
 
-```
-def kMeans(dataSet, k, distMeas=distEclud,createCent=randCent):
-    m = shape(dataSet)[0]
-    clusterAssment = mat(zeros((m,2)))
-    centroids = createCent(dataSet,k)
-    clusterChanged = True
-    while clusterChanged:
-	  clusterChanged = False
-          for i in range(m):
-              minDist = inf; minIndex = -1
-              for j in range(k):
-                  distJI = distMeas(centroids[j,:],dataSet[i,:])
-		  if distJI < minDist:
-		     minDist = distJI; minIndex = j
-	      if clusterAssment[i,0] != minIndex: clusterChanged = True
-	      clusterAssment[i,:] = minIndex,minDist**2
-          print centroids
-          for cent in range(k):
-	      ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]
-              centroids[cent,:] = mean(ptsInClust,axis=0)
-	  return centroids,clusterAssment
-```
+
+	def kMeans(dataSet, k, distMeas=distEclud,createCent=randCent):
+	    m = shape(dataSet)[0]
+	    clusterAssment = mat(zeros((m,2)))
+	    centroids = createCent(dataSet,k)
+	    clusterChanged = True
+	    while clusterChanged:
+		  clusterChanged = False
+	          for i in range(m):
+	              minDist = inf; minIndex = -1
+	              for j in range(k):
+	                  distJI = distMeas(centroids[j,:],dataSet[i,:])
+			  if distJI < minDist:
+			     minDist = distJI; minIndex = j
+		      if clusterAssment[i,0] != minIndex: clusterChanged = True
+		      clusterAssment[i,:] = minIndex,minDist**2
+	          print centroids
+	          for cent in range(k):
+		      ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]
+	              centroids[cent,:] = mean(ptsInClust,axis=0)
+		  return centroids,clusterAssment
+
 
 （感谢中国人民大学陈晞提供素材和案例。）

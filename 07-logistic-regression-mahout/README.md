@@ -26,9 +26,9 @@ Logistic 回归常是一种有效的分类问题学习方法,并且模型可解�
 
 
 
-```
-$ mahout trainlogistic --input train_redwine.csv \> --output ./logit_model \> --target quality --categories 2 \> --predictors fixed.acidity volatile.acidity citric.acid \> residual.sugar chlorides free.sulfur.dioxide total.sulfur.dioxide \ > density pH sulphates alcohol --types numeric \> --features 20 --passes 100
-```
+
+	$ mahout trainlogistic --input train_redwine.csv \	> --output ./logit_model \	> --target quality --categories 2 \	> --predictors fixed.acidity volatile.acidity citric.acid \	> residual.sugar chlorides free.sulfur.dioxide total.sulfur.dioxide \ > density pH sulphates alcohol --types numeric \	> --features 20 --passes 100
+
 
 以上代码在存放数据集train_redwine.csv和test_redwine.csv的目录下运行. 其中使用的选项包括:
 
@@ -37,10 +37,10 @@ $ mahout trainlogistic --input train_redwine.csv \> --output ./logit_model \> 
 ### Logistic 回归模型测试
 通过以上得到的 Logistic 模型对测试集做模型检测的代码如下。
 
-```
-$ mahout runlogistic --input test_redwine.csv \ 
-> --model ./logit_model --auc --confusion
-```
+
+	$ mahout runlogistic --input test_redwine.csv \ 
+	> --model ./logit_model --auc --confusion
+
 以上代码中使用的选项包括:
 
 - runlogistic代表通过测试集检验之前得到的Logistic回归的模型解的效果- --input说明使用的测试集为test_redwine.csv- --model说明使用的Logistic回归模型结果文件为logit_model- --auc表示输出模型的AUC得分,即ROC曲线下方的面积占比- --confusion表示输出混淆矩阵
@@ -49,29 +49,29 @@ $ mahout runlogistic --input test_redwine.csv \
 随机森林是一种机器学习集成算法,它的思想基于使用多个弱分类器得到强分类器. 随机森林算法基于决策树的算法。随机森林算法事实上建立的多个决策树是可以并行计算的。在测试结果的时候，也可以并行计算多个个决策树的分类结果.所以要在 Hadoop 上使用 MapReduce 建立随机森林的模型,一般定义 Mapper 函数和 Reducer 函数为:1. Mapper:在各个子节点上并行地分别抽取训练样本和输入变量,建立决策树. 2. Reducer:整合各个子节点计算得到的多个决策树.
 ### 数据准备
 在 Linux 系统下的 Mahout 下并行计算随机森林模型要求的输入数据集是纯数据集, 不包含变量信息,所以我们将 Logistic 回归中使用的数据集 train_redwine.csv 和 test_redwine.csv 删除首行变量名信息,并删除红酒样本序号一列,得到数据集 redwine_train.arff 和 redwine_test.arff.为了使用 Hadoop 并行计算完成 Mahout 的随机森林的计算,首先要将数据集 redwine_train.arff 和 redwine_test.arff 放入 HDFS 中,代码如下:
-```$ hadoop fs –put redwine*```因为数据集 redwine_train.arff 和 redwine_test.arff 本身没有变量信息,要在随机森林 算法中学习,需要建立变量信息文件,可以使用 Mahout 中的 Describe 工具创建变量信息 文件,代码如下:
-```
-$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ > org.apache.mahout.classifier.df.tools.Describe \> -p redwine_train.arff \> -f redwine_train.info \> -d 11 N L```
+	$ hadoop fs –put redwine*因为数据集 redwine_train.arff 和 redwine_test.arff 本身没有变量信息,要在随机森林 算法中学习,需要建立变量信息文件,可以使用 Mahout 中的 Describe 工具创建变量信息 文件,代码如下:
+
+	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ > org.apache.mahout.classifier.df.tools.Describe \	> -p redwine_train.arff \	> -f redwine_train.info \	> -d 11 N L
 以上代码使用 Hadoop 运行 Mahout 的方法 classifier.df.tools.Describe,其中使用的选项包 括:
 - -p说明要生成的变量信息用于描述数据集redwine_train.arff- -f说明生成的变量信息保存为文件redwine_train.info- -d说明数据集中的变量信息,后面的内容意思为该数据集中的变量前11个都是数值 型,最后一个是因变量
 可以通过如下语句查看生成的变量信息文件 redwine_train.info 内容:
-```hadoop fs -cat redwine_train.info```
+	hadoop fs -cat redwine_train.info
 为了训练集合变量描述两个数据集在并行计算中其他计算机的使用,需要修改它们的使用权限,代码如下:
-```
-$ hadoop fs -chmod 751 redwine_train.arff 
-$ hadoop fs -chmod 751 redwine_train.info```
+
+	$ hadoop fs -chmod 751 redwine_train.arff 
+	$ hadoop fs -chmod 751 redwine_train.info
 ### 随机森林模型训练
 在 Hadoop 中并行计算 Mahout 的随机森林模型代码如下:
-```
-$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ 
-> org.apache.mahout.classifier.df.mapreduce.BuildForest \> -d redwine_train.arff \> -ds redwine_train.info \> -o redwine_forest \ > -sl 5 -t 100```
+
+	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ 
+	> org.apache.mahout.classifier.df.mapreduce.BuildForest \	> -d redwine_train.arff \	> -ds redwine_train.info \	> -o redwine_forest \ 	> -sl 5 -t 100
 以上代码使用 Hadoop 的 MapReduce 运行 Mahout 的机器学习算法建立随机森林,其中使 用的选项包括:
 - -d说明使用的训练集redwine_train.arff- -ds说明使用的变量描述文件redwine_train.info- -o说明将计算得到的随机森林模型结果输出到目录redwine_forest下 - -sl说明建立每个决策树时随机选择的自变量数,在此定义为5- -t说明建立的决策树数目,在此定义为100
 ### 随机森林模型测试
 使用测试集测试如上生成的随机森林模型的效果代码如下:
-```
-$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ 
-> org.apache.mahout.classifier.df.mapreduce.TestForest \> -i redwine_test.arff \> -ds redwine_train.info \> -m redwine_forest \> -o redwine_prediction \ > -a```其中使用的选项包括
+	
+	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ 
+	> org.apache.mahout.classifier.df.mapreduce.TestForest \	> -i redwine_test.arff \	> -ds redwine_train.info \	> -m redwine_forest \	> -o redwine_prediction \ 	> -a其中使用的选项包括
 - -i说明使用的测试集redwine_test.arff- -ds说明使用的变量描述文件redwine_train.info- -m说明测试的模型来自目录redwine_forest- -o说明测试输出的结果输出到目录redwine_prediction下 - -a要求输出混淆矩阵
 
 得到的随机森林模型测试输出结果可以看到随机森林的正确率高达 98.33%. Logistic 模型的测试结果的混淆矩阵,随机森林模型的准确性十分高. 虽 然随机森林的判断结果准确性更高,但是模型解释性相较 Logistic 回归模型较差,我们没 有办法通过输出的结果说明红酒的各个属性变量在判断红酒质量方面的贡献.

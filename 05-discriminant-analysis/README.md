@@ -21,20 +21,20 @@
 ### 生成数据
 以0类中的x1（airtemperature）变量为例展示，其他变量与此类似，1类与0类类似。
 
-```#########导出判别分析的训练样本集x10trainx10<-matrix((subset(pdata[,1],pdata[,6]==0)))write.table(trainx10,file="d:/trainx10.txt",sep=",",row.names=F,col.names=F)
-```
+	#########导出判别分析的训练样本集x10	trainx10<-matrix((subset(pdata[,1],pdata[,6]==0)))	write.table(trainx10,file="d:/trainx10.txt",sep=",",row.names=F,col.names=F)
+
 
 ### Mapper函数
 
 计算0类中的x1（airtemperature）变量均值的mapper如下所示，它是每一块中所有数据的均值。计算0类中的x1（airtemperature）变量方差的mapper函数与之类似。
-```
-#! /usr/bin/env Rscriptoptions(warn=-1)sink("/dev/null")input<-file("stdin","r")while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0){	fields<-unlist(strsplit(currentLine, ","))	data<-sum(as.numeric(fields))	sink()	cat(data,"\n", sep="\t")	sink("/dev/null")}close(input)
-```
+
+	#! /usr/bin/env Rscript	options(warn=-1)	sink("/dev/null")	input<-file("stdin","r")	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)	{		fields<-unlist(strsplit(currentLine, ","))		data<-sum(as.numeric(fields))		sink()		cat(data,"\n", sep="\t")		sink("/dev/null")	}	close(input)
+
 
 ### Reducer函数
 
-计算0类中的x1（airtemperature）变量均值的reducer如下所示，它为由mapper传递到reducer中所有数据的均值。计算0类中的x1（airtemperature）变量方差的reducer与之类似。```
-#! /usr/bin/env Rscriptoptions(warn=-1)sink("/dev/null")input<-file("stdin","r")data<-0while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0){	fields<-unlist(strsplit(currentLine, "\t"))	data<-data+as.numeric(fields)}x10bar<-data/305sink()cat(x10bar,"\n",sep="\t")sink("/dev/null")close(input)```
+计算0类中的x1（airtemperature）变量均值的reducer如下所示，它为由mapper传递到reducer中所有数据的均值。计算0类中的x1（airtemperature）变量方差的reducer与之类似。
+	#! /usr/bin/env Rscript	options(warn=-1)	sink("/dev/null")	input<-file("stdin","r")	data<-0	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)	{		fields<-unlist(strsplit(currentLine, "\t"))		data<-data+as.numeric(fields)	}	x10bar<-data/305	sink()	cat(x10bar,"\n",sep="\t")	sink("/dev/null")	close(input)
 
 ## 结论
 由本文的研究可知平均气温、平均水汽压、平均相对湿度、平均风速和日照时数对雾霾有影响。简单的基于这些因素通过距离判别法对是否雾霾进行分析预测的错判率为0.3，可以用此方法进行预测。
