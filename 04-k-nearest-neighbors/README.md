@@ -26,16 +26,16 @@ k-最临近分类法是一个理论上比较成熟的机器学习算法,该方�
 5. Map 函数的输出为:测试集实际的分类及与当前距离最近的 k 个 点所属类别。
 
 
-		#! /usr/bin/env Rscript		sink("/dev/null")		# 读取iris数据集 		input<-file("stdin","r") 		rawdata<-read.table(input) 		k=5		# 归一化 		data<-cbind(as.data.frame(scale(rawdata[,1:4])),Species=raw data[,5])		# 随机选择其中的120条记录作为训练集,30条作为测试集 		sampleid<-sample(1:150,120)		train <- data[sampleid,]		test <- data[-sampleid,]		#对测试集的每一个样本执行如下步骤 		for(i in 1:nrow(test)){			#记录与每个训练集的距离及该样本的分类			dis2train <- matrix(rep(0,nrow(train)*2),ncol=2)			# 计算距离并保存训练集的分类信息			for(j in 1:nrow(train)){				dis2train[j,1] <- dist(rbind(test[i,1:4],train[j,1:4]),method="euclidean")				dis2train[j,2] <- train[j,5]			}				#按距离从小到大排序 			sorteddis2train<-dis2train[order(dis2train[,1]),] 			sink()				#将测试集实际的分类及与当前距离最近的k个点所属类别 			cat(test[i,5],sorteddis2train[1:k,2],"\n",sep="\t") 			sink("/dev/null")		} 		close(input)
+		#! /usr/bin/env Rscript		sink("/dev/null")		# 读取iris数据集 		input<-file("stdin","r") 		rawdata<-read.table(input) 		k=5		# 归一化 		data<-cbind(as.data.frame(scale(rawdata[,1:4])),Species=raw data[,5])		# 随机选择其中的120条记录作为训练集,30条作为测试集 		sampleid<-sample(1:150,120)		train <- data[sampleid,]		test <- data[-sampleid,]		#对测试集的每一个样本执行如下步骤 		for(i in 1:nrow(test)){			#记录与每个训练集的距离及该样本的分类			dis2train <- matrix(rep(0,nrow(train)*2),ncol=2)			# 计算距离并保存训练集的分类信息			for(j in 1:nrow(train)){				dis2train[j,1] <- dist(rbind(test[i,1:4],train[j,1:4]),method="euclidean")				dis2train[j,2] <- train[j,5]			}				#按距离从小到大排序 			sorteddis2train<-dis2train[order(dis2train[,1]),] 			sink()				#将测试集实际的分类及与当前距离最近的k个点所属类别 			cat(test[i,5],sorteddis2train[1:k,2],"\n",sep="\t") 			sink("/dev/null")		} 		close(input)
 
 
 ### Reducer 函数
-1. 前 k 个点出现频率最高的类别作为当前点的预测类别。 
-2. Reduce 函数的输出为:测试集的实际分类及预测分类。
+1. 前 k 个点出现频率最高的类别作为当前点的预测类别。
+2. Reduce 函数的输出为:测试集的实际分类及预测分类。
 
 
-		#! /usr/bin/env Rscript		sink("/dev/null")		#读取map的输出		input <- file("stdin","r") 		species <- read.table(input)		for(i in 1:nrow(species)){ 
-			#计算频率			freq <- as.data.frame(table(species[i,2:5]))			#将频率从大到小排列			sortedfreq <- freq[order(-freq$Freq),] 			sink()			#输出测试集的实际分类及预测分类 			cat(as.character(species[i,1]),as.character(sortedfreq[1,1] ),'\n',sep='\t')			sink("/dev/null") 		}		close(input)
+		#! /usr/bin/env Rscript		sink("/dev/null")		#读取map的输出		input <- file("stdin","r") 		species <- read.table(input)		for(i in 1:nrow(species)){
+			#计算频率			freq <- as.data.frame(table(species[i,2:5]))			#将频率从大到小排列			sortedfreq <- freq[order(-freq$Freq),] 			sink()			#输出测试集的实际分类及预测分类 			cat(as.character(species[i,1]),as.character(sortedfreq[1,1] ),'\n',sep='\t')			sink("/dev/null") 		}		close(input)
 
 
 
@@ -48,7 +48,7 @@ k-最临近分类法是一个理论上比较成熟的机器学习算法,该方�
 
 
 	             setosa versicolor virginica
-	setosa         11        0         0	versicolor      0        12        1	virginica       0        1         5
+	setosa         11        0         0	versicolor      0        12        1	virginica       0        1         5
 
 
 （感谢北京大学吴雅雯提供素材和案例。）

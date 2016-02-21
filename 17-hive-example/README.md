@@ -6,8 +6,8 @@
 * Hive
 
 
-## 数据准备
-
+## 数据准备
+
 FoodMart数据库为某家大型的食品连锁店的经营业务所产生的数据，该数据涉及到了公司经营的各个方面，包括产品、库存、人事、客户和销售等。该数据库中的表包括顾客的基本信息表、货币信息表、公司部门表、职员表、消费表、地区表等。FoodMart数据库经常用于多维分析的测试数据集，同数据库部分的学习，我们选取其中一个数据库子集：sales_fact_1997、customer、product、product_class、time_by_day、store、promotion7个表导入Hive中进行测试。
 在进行测试之前，我们需要在原有数据库中将所需要的数据表导出，此处，我们以文本形式为例进行。各表的维度如下表所示：
 
@@ -17,22 +17,22 @@ FoodMart数据库为某家大型的食品连锁店的经营业务所产生的数
 	product	           1560	     15
 	product_class	    110	      5
 	store	             25	     25
-	promotion	       1864	      7  
+	promotion	       1864	      7
 	sales_fact_1997	 210429	      8
 	time_by_day	        730	     10
-## 数据迁移与导入
-###创建数据库
-创建名为“FoodMart”的数据库并使用：
-
+## 数据迁移与导入
+###创建数据库
+创建名为“FoodMart”的数据库并使用：
+
 	hive> CREATE DATABASE IF NOT EXISTS FoodMart;
-	hive> USE FoodMart;
+	hive> USE FoodMart;
 ### 创建表格
 
 store表维度最小，在此以创建store表为例，首先在FoodMart数据库下创建名为“store”的表，随后将本地数据LOAD至HIVE端即可：
 创建表格：
 
 	hive> CREATE TABLE IF NOT EXISTS store (
-	store_id INT, store_type STRING,region_id INT,store_name STRING, store_number INT, store_street_address STRING,	store_city STRING,store_state STRING,	store_postal_code STRING,store_country STRING, store_manager STRING, store_phone STRING, store_fax STRING,first_opened_date STRING, last_remodel_date STRING, lease_sqft STRING,	store_sqft STRING,	grocery_sqft STRING, frozen_sqft STRING,meat_sqft STRING, coffee_bar STRING, video_store STRING, salad_bar STRING,	prepared_food STRING, florist STRING) 
+	store_id INT, store_type STRING,region_id INT,store_name STRING, store_number INT, store_street_address STRING,	store_city STRING,store_state STRING,	store_postal_code STRING,store_country STRING, store_manager STRING, store_phone STRING, store_fax STRING,first_opened_date STRING, last_remodel_date STRING, lease_sqft STRING,	store_sqft STRING,	grocery_sqft STRING, frozen_sqft STRING,meat_sqft STRING, coffee_bar STRING, video_store STRING, salad_bar STRING,	prepared_food STRING, florist STRING)
 	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
 
 ### 导入数据
@@ -54,11 +54,11 @@ store表维度最小，在此以创建store表为例，首先在FoodMart数据�
 
 
 
-##数据查询示例
+##数据查询示例
 简单查询，如查询编号为1的用户在customer表中的所有信息：
 
 
-	hive> select * from customer where customer_id=1;                                       
+	hive> select * from customer where customer_id=1;
 
 
 连接查询，查询销售额最高的top3的用户是谁，基本的思路是先查询sales_fact_1997中排序前3的customer_id，再使用id与customer做连接查询出其他信息如姓名即可。
@@ -72,7 +72,7 @@ store表维度最小，在此以创建store表为例，首先在FoodMart数据�
 
 
 	hive> select b.lname,b.fname,a.cost_total from
-	    > (select customer_id, sum(store_cost) as cost_total from sales_fact_1997 group by customer_id sort by cost_total DESC limit 3 ) a 
+	    > (select customer_id, sum(store_cost) as cost_total from sales_fact_1997 group by customer_id sort by cost_total DESC limit 3 ) a
 	    > left outer join
 	    > (select customer_id, lname,fname from customer ) b
 	> on a.customer_id=b.customer_id;
@@ -87,7 +87,7 @@ store表维度最小，在此以创建store表为例，首先在FoodMart数据�
 
 
 
-	insert overwrite local directory '/home/cao.xin/customer_1' 
+	insert overwrite local directory '/home/cao.xin/customer_1'
 	select * from customer where total_children>'2';
 
 

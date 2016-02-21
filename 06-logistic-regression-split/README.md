@@ -1,4 +1,4 @@
-# 实例分析：基于MapReduce的Logistics回归
+# 实例分析：基于MapReduce的Logistics回归
 
 
 ## 准备知识
@@ -7,10 +7,10 @@
 * R和Python
 * Hadoop Streaming
 
-## 研究思路
-Logit模型(Logistic model)，是最早的离散选择模型。Logit模型的求解速度快、应用方便，可以对预测的结果进行比较和检验，在社会学、生物统计学、临床、数量心理学、计量经济学、市场营销等统计实证分析中广为应用。本文以R软件中的Orange Juice数据为研究对象，通过描述性分析对消费者橙汁品牌选择的偏好进行初步分析，继而分别建立了Logit回归模型，对消费数据进行拟合分析。最后在MapReduce实践部分，展示了完整的从数据获取到Map函数、Reduce函数以及输出结果的过程。在服务器上使用MapRuducer的方法， 对Logistics回归进行并行计算操作。Map函数的具体流程如下：1、首先将数据分成k个不同的块。2、对每一块的数据进行logistic回归估计出自变量的系数；Reduce函数则对每一块的自变量系数进行平均，作为最终的结果。可以证明，当数据量n和每一个子块中的数据量m足够大的情况下，用这种MapReduce方法计算出来的系数估计与真实值具有一致性。
-## 数据准备
-本研究所用样本数据均来自R软件ISLR包中的OJ数据，样本中包含1070个消费者购买Citrus Hill 牌或Minute Maid牌橙汁的行为数据。1070个样本数据的18个变量包含Purchase、Store7、StoreID和STORE4个分类变量，和其余的14个数值变量，用于以下研究分析。
+## 研究思路
+Logit模型(Logistic model)，是最早的离散选择模型。Logit模型的求解速度快、应用方便，可以对预测的结果进行比较和检验，在社会学、生物统计学、临床、数量心理学、计量经济学、市场营销等统计实证分析中广为应用。本文以R软件中的Orange Juice数据为研究对象，通过描述性分析对消费者橙汁品牌选择的偏好进行初步分析，继而分别建立了Logit回归模型，对消费数据进行拟合分析。最后在MapReduce实践部分，展示了完整的从数据获取到Map函数、Reduce函数以及输出结果的过程。在服务器上使用MapRuducer的方法， 对Logistics回归进行并行计算操作。Map函数的具体流程如下：1、首先将数据分成k个不同的块。2、对每一块的数据进行logistic回归估计出自变量的系数；Reduce函数则对每一块的自变量系数进行平均，作为最终的结果。可以证明，当数据量n和每一个子块中的数据量m足够大的情况下，用这种MapReduce方法计算出来的系数估计与真实值具有一致性。
+## 数据准备
+本研究所用样本数据均来自R软件ISLR包中的OJ数据，样本中包含1070个消费者购买Citrus Hill 牌或Minute Maid牌橙汁的行为数据。1070个样本数据的18个变量包含Purchase、Store7、StoreID和STORE4个分类变量，和其余的14个数值变量，用于以下研究分析。
 
 ## 建立Logit回归模型
 
@@ -25,7 +25,7 @@
 	import pandas as pd
 	from statsmodels.api import *
 	import numpy as np
-	
+
 	Purchase = []
 	WeekofPurchase = []
 	StoreID = []
@@ -61,28 +61,28 @@
 	    PctDiscMM.append(float(vrb[15]))
 	    PctDiscMM.append(float(vrb[16]))
 	    Store.append(float(vrb[18]))
-	    	
+
 	f.close
 
 	#因变量选择PUrchase中的MM，如果是MM则取1否则为0
 	MM = pd.get_dummies(Purchase)#将分类型变量转化为0，1
 	MM = MM[MM.columns[1]]#选择MM为真的一列
-	
+
 	#选取自变量
 	xdata = pd.DataFrame([PriceCH,PriceMM,DiscCH,DiscMM,SpecialCH,SpecialMM,LoyalCH])
-	xdata=xdata.T                      
+	xdata=xdata.T
 	xdata.columns=['PriceCH','PriceMM','DiscCH','DiscMM','SpecialCH','SpecialMM','LoyalCH']
 	xdata['intercept']=1.0
-	
+
 	#打乱顺序
 	shuffle = np.random.permutation(1069)
 	MM = MM[shuffle]
 	xdata = xdata.ix[shuffle]
-	
+
 	l = len(MM)
 	n=3#划分不同的几块，这里令n=3
 	step = l/n
-	
+
 	#对前n-1块进行计算
 	for i in range(n-1):
 	    #print ("利用第{}行到{}行的数据进行建模。".format(step*i,step*(i+1)))
@@ -92,7 +92,7 @@
 	    for j in range(len(res.params)):
 	        print res.params [j]
 	    print ','
-	
+
 	#对最后一块进行计算
 	#print ("利用第{}行到{}行的数据进行建模。".format(step*(n-1),l))
 	logitmodel = Logit(MM[step*(n-1):l],xdata[step*(n-1):l])
@@ -124,6 +124,6 @@
 	print data.mean()
 
 
-### 实践结论
-观察Logit全模型的估计结果，可以发现CH标价（PriceCH）、MM标价（PriceMM）、MM折扣（DiscMM）、CH品牌忠诚度（LoyalCH）、MM折扣比例（PctDiscMM）对Purchase有显著的影响。一定程度上对Purchase有解释作用，而其他变量对因变量解释性并不显著。通过对比MapReduce的结果和利用全部数据同时建模的结果可以发现，MapReduce的结果精确度还是比较高的，为了避免是一次实验造成的随机性结果，又重复多次进行计算，发现大多数变量的系数依然较为只有“CH特殊指标（SpecialCH）“这一个变量的系数有可能出现符号相反的结果，考虑到其系数本身就接近于0，同时并不显著，所以不能改变我们对最终结果比较精确的判断。在对三个子块进行建模得到的系数进行比较后，发现不同子块之间的个别变量的系数差别还是比较大的，例如“CH价格（PriceCH）”三次得到结果分别是6.28，1.44和4.39，这可能与数据的分布有关系，但是不影响最终Reduce的效果。
-（感谢中央财经大学朱述政提供素材和案例。）
+### 实践结论
+观察Logit全模型的估计结果，可以发现CH标价（PriceCH）、MM标价（PriceMM）、MM折扣（DiscMM）、CH品牌忠诚度（LoyalCH）、MM折扣比例（PctDiscMM）对Purchase有显著的影响。一定程度上对Purchase有解释作用，而其他变量对因变量解释性并不显著。通过对比MapReduce的结果和利用全部数据同时建模的结果可以发现，MapReduce的结果精确度还是比较高的，为了避免是一次实验造成的随机性结果，又重复多次进行计算，发现大多数变量的系数依然较为只有“CH特殊指标（SpecialCH）“这一个变量的系数有可能出现符号相反的结果，考虑到其系数本身就接近于0，同时并不显著，所以不能改变我们对最终结果比较精确的判断。在对三个子块进行建模得到的系数进行比较后，发现不同子块之间的个别变量的系数差别还是比较大的，例如“CH价格（PriceCH）”三次得到结果分别是6.28，1.44和4.39，这可能与数据的分布有关系，但是不影响最终Reduce的效果。
+（感谢中央财经大学朱述政提供素材和案例。）
