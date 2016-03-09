@@ -74,9 +74,10 @@ URL_address_of_data 为上面的网址。
 建描述信息。
 
 	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \
-      org.apache.mahout.classifier.df.tools.Describe \ -p pkuzcy/train.arff \
-		  -f pkuzcy/train.info \
-		  -d 10 N L
+      org.apache.mahout.classifier.df.tools.Describe \
+      -p pkuzcy/train.arff \
+	  -f pkuzcy/train.info \
+	  -d 10 N L
 
 这里,$MAHOUT_HOME 代表/home/dmc/mahout.参数-p 表示输入文件,-f 表示输出文件;在 hadoop 平台
 上调用 mahout,输入输出均为 HDFS 文件系统中 的数据。-d 表示要描述的数据集的变量信息,其后的
@@ -94,7 +95,8 @@ train.info 的文件。使用 cat 命 令查看该路径下所有的 info 文件
 
 	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \
       org.apache.mahout.classifier.df.mapreduce.BuildForest \
-		 -Dmapred.max.split.size=147739 \ -d pkuzcy/train.arff \
+		 -Dmapred.max.split.size=147739 \
+         -d pkuzcy/train.arff \
 		 -ds pkuzcy/train.info \
 		 -sl 5 –p -t 100 -o magicForest
 这里的 Dmapred.max.split.size 参数表示 hadoop 分布式计算每部分数据的最 大规模,默认为原始数据的十分之一,这里使用 147739 即为原始训练集的 1/10. 参数-sl 表示每棵树的使用随机的 5 个变量来构建;参数-p 表示分布式计算;参 数-t 表示子树的数量,这里取 100 棵;参数-o 表示建立好的模型存放在 magicForest 路径下。
@@ -178,9 +180,12 @@ SparkContext,可以通过 sc 变量来访问它。创建第一个 RDD。
 在测试集上应用上面建立的模型来分类,并与测试集的标准交过作比较,计算误判率,以此来检验模型的
 优劣。
 
-	$ predictions = model.predict(testData.map(lambda x: \ x.features))
-	labelsAndPredictions = testData.map(lambda lp: lp.label \ ).zip(predictions)
-	cetestErr = labelsAndPredictions.filter(lambda (v, p): \ v != p).count() / 				float(testData.count())
+	$ predictions = model.predict(testData.map(lambda x:
+        \ x.features))
+	labelsAndPredictions = testData.map(lambda lp: lp.label
+        \ ).zip(predictions)
+	cetestErr = labelsAndPredictions.filter(lambda (v, p):
+        \ v != p).count() / float(testData.count())
 	print('Test Error = ' + str(testErr))
 
 如果要查看每个子树的具体情况,可以用下面的命令输出:

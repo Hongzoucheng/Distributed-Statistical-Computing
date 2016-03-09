@@ -68,7 +68,7 @@ glm()函数,选择参数中的“family”为泊松回归
 	pred = predict(pos1, a)
 	lam = exp(pred)RME = abs(a$Y - lam) / (1 + lam)
 	summary(RME)
-	
+
 
 
 
@@ -140,9 +140,9 @@ glm()函数,选择参数中的“family”为泊松回归,执行出的结果中�
 	input = file("stdin", "r")
 	test = readLines(input, n=1, warn=F)
 	p = length((unlist(strsplit(test, ","))))
-	                                        # 求出数据中的变量个数 p
+	# 求出数据中的变量个数 p
 	while(length(data <- readLines(input, n = 200, warn = F)) > 0)
-	                                        # 每 200 行数据为一个分块
+	    # 每 200 行数据为一个分块
 	{
 	    a = data.frame(matrix(as.numeric(unlist(strsplit(data, ","))), ncol = p, byrow = T))
 	    names(a) = c("NUM", "Y", "X1", "X2", "X3", "X4")
@@ -153,7 +153,7 @@ glm()函数,选择参数中的“family”为泊松回归,执行出的结果中�
 	    lam = exp(pred)
 	    RME = abs(a$Y - lam) / (1+lam)
 	    mean = mean(RME)
-	                                        # 相对预测误差
+	        # 相对预测误差
 	    cat(coefficients, '\n')
 	    cat(pvalue, '\n')
 	    cat(mean, '\n')
@@ -178,7 +178,7 @@ reducer 函数的主要功能是归约,即对映射后的结果进行合并整�
 
 
 
-	#! /usr/bin/env Rscript
+    #! /usr/bin/env Rscript
 	input = file("stdin", "r")
 	i = 0
 	coefficients = rep(0,5)
@@ -189,15 +189,16 @@ reducer 函数的主要功能是归约,即对映射后的结果进行合并整�
 	    i = i+1
 	    fields = strsplit(mapresult, ' ')
 	    if (i%%3 == 1) {
-	        coefficients = coefficients + as.numeric(fields[[1]]) # 对 1、4、7、10 行的系数求和
+            # 对 1、4、7、10 行的系数求和
+	        coefficients = coefficients + as.numeric(fields[[1]])
 	    }
 	    else if (i%%3 == 2) {
 	        pvalue = pvalue + as.numeric(fields[[1]])
-	                                        # 对 2、5、8、11 行的 p 值求和
+	            # 对 2、5、8、11 行的 p 值求和
 	    }
 	    else if (i%%3 == 0) {
 	        mean = mean + as.numeric(fields[[1]])
-	                                        # 对 3、6、9、12 行的误差求和
+              # 对 3、6、9、12 行的误差求和
 	    }
 	}
 	coefficients = coefficients/(i/3)
