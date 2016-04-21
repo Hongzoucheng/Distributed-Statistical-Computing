@@ -108,17 +108,17 @@ X4 - 平均排名        -0.109     0.080     0.176
 的,且使分块运算结果没有系统上的差异。
 
 \begin{lstlisting}
-#! /usr/bin/env Rscript
-input = file("stdin", "r")
-poi = readLines(input, warn = F)
-poi = matrix(as.numeric(unlist(strsplit(poi, ","))), ncol = 5, byrow = T)
-poi = data.frame(poi)
-n = dim(poi)[1]
-set.seed(1)
-sam = sample(n)
-poi = poi[sam, ]
-write.csv(poi, "poisson2.csv")
-close(input)
+	#! /usr/bin/env Rscript
+	input = file("stdin", "r")
+	poi = readLines(input, warn = F)
+	poi = matrix(as.numeric(unlist(strsplit(poi, ","))), ncol = 5, byrow = T)
+	poi = data.frame(poi)
+	n = dim(poi)[1]
+	set.seed(1)
+	sam = sample(n)
+	poi = poi[sam, ]
+	write.csv(poi, "poisson2.csv")
+	close(input)
 \end{lstlisting}
 
 接下来我们对新数据执行 MapReduce 并行计算。该并行过程是通过 mapper函数和
