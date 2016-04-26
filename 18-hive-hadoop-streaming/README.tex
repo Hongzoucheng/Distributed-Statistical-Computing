@@ -16,8 +16,8 @@
 \subsection{数据准备}\label{ux6570ux636eux51c6ux5907}
 
 与Hadoop类似，Hive也支持使用JAVA之外的语言编写Streaming程序扩展Hive，实现Hive中的函数无法实现的功能。开发Hive的Streaming程序和开发Hadoop的Streaming程序是相同的，都是从标准输入中读取数据，将结果写出到标准输出中。
-Hive中提供多个语法来使用Streaming，包括map(), reduce(), TRANSFORM(
-)，使用TRANSFROM()的情形较多。
+Hive中提供多个语法来使用Streaming，包括\texttt{map()}, \texttt{reduce()}, \texttt{TRANSFORM(
+)}，使用\texttt{TRANSFROM()}的情形较多。
 例如，我们现在需要将表格中的日期字符串转换成季节字符串形式，若现在的日期形式为YYYY-MM-DD，通过变换，希望输出YYYYQ1的季节字符串形式。我们在Hive中创建表格birdata，并载入。测试数据：
 
 \begin{lstlisting}
@@ -50,8 +50,8 @@ for line in sys.stdin:
     print "\t".join(output_fields)
 \end{lstlisting}
 
-再次，在Hive中调用上面的Streaming脚本；这个调用中包含两个步骤，第一步需要以绝对路径的方式添加脚本；第二步需要用TRANSFORM\ldots{}USING\ldots{}AS句式进行调用。
-use test; add file /Users/hive/quarter.py; select TRANSFROM(birthday)
-using `quarter.py' as (bir\_quarter) from birdata;
-注意，使用这种方式调用Streaming，select中除了TRANSPORM外不能有别的字段。在大数据集上使用Streaming时，一般都需要和DISTRIBUTE
-BY\ldots{}, SORT BY句式一起使用，解决单节点负载过重问题。
+再次，在Hive中调用上面的Streaming脚本；这个调用中包含两个步骤，第一步需要以绝对路径的方式添加脚本；第二步需要用\texttt{TRANSFORM\ldots{}USING\ldots{}AS}句式进行调用。
+\texttt{use test}; \texttt{add file /Users/hive/quarter.py}; \texttt{select TRANSFROM(birthday)
+using `quarter.py' as (bir\_quarter) from birdata};
+注意，使用这种方式调用Streaming，\texttt{select}中除了\\\texttt{TRANSPORM}外不能有别的字段。在大数据集上使用Streaming时，一般都需要和\texttt{DISTRIBUTE
+BY\ldots{}}, \texttt{SORT BY}句式一起使用，解决单节点负载过重问题。

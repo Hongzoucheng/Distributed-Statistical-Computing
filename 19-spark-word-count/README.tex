@@ -49,13 +49,13 @@ program进行聚合或编译。本质上，驱动程序创建一个或多个RDD�
 
 \subsection{Word Count 演示}\label{word-count-ux6f14ux793a}
 
-为了演示''word
-count''的功能，我们在计算机路径下存储了一部小说《福尔摩斯全集》。
+为了演示“word
+count”的功能，我们在计算机路径下存储了一部小说《福尔摩斯全集》。
 
 首先，在命令行中输入以下命令：
 
 \begin{lstlisting}
-pyspark
+	$ pyspark
 \end{lstlisting}
 
 PySpark将会自动使用本地Spark配置创建一个SparkContext。你可以通过sc变量来访问它。
@@ -63,57 +63,57 @@ PySpark将会自动使用本地Spark配置创建一个SparkContext。你可以�
 下面我们来创建第一个RDD
 
 \begin{lstlisting}
->>>text = sc.textFile("SherlockHolmes.txt")
->>> print text
+	Pyspark> text = sc.textFile("SherlockHolmes.txt")
+	Pyspark> print text
 \end{lstlisting}
 
 由于我们访问的是本地的数据文件，所以没有必要使用addFile函数。textFile方法将数据文件加载到
 一个RDD命名文本。使用print命令查看RDD，可以发现这是一个MapPartitionsRDD。注意，文件路径是
 相对于当前工作目录的一个相对路径，在上一段命令中我们没有输入文件的路径是因为我们是在数据文
-件所在的目录下打开pyspark的。我们转换下这个RDD，来进行分布式计算的``hello
-world''：
+件所在的目录下打开Pyspark的。我们转换下这个RDD，来进行分布式计算的“hello
+world”：
 
 \begin{lstlisting}
->>> from operator import add
->>>def acf(text):
-       return text.split()
->>> words = text.flatMap(acf)
->>> print words
+	Pyspark> from operator import add
+	Pyspark> def acf(text):
+		       return text.split()
+	Pyspark> words = text.flatMap(acf)
+	Pyspark> print words
 \end{lstlisting}
 
 我们首先引入了add这个函数，作为加法的闭包来使用。首先我们要做的是把文本拆分为单词。我们创
-建了一个tokenize函数，参数是文本片段，返回根据空格拆分的单词列表。然后我们通过给flatMap操
-作符传递tokenize闭包对textRDD进行变换创建了一个wordsRDD。words是个PythonRDD，但是执行本应
+建了一个acf函数，参数是文本片段，返回根据空格拆分的单词列表。然后我们通过给flatMap操
+作符传递acf闭包对textRDD进行变换创建了一个wordsRDD。words是个PythonRDD，但是执行本应
 该立即进行。显然，我们还没有把整个数据集拆分为单词列表。
 
-如果你曾使用MapReduce做过Hadoop版的``字数统计''，你应该知道下一步是将每个单词映射到一个键值
+如果你曾使用MapReduce做过Hadoop版的“Word Count”，你应该知道下一步是将每个单词映射到一个键值
 对，其中键是单词，值是1，然后使用reducer计算每个键的1总数。
 
 首先，我们定义一个mapper
 
 \begin{lstlisting}
->>>def chag(x):
-    return (x,1)
->>> wc = words.map(chag)
->>> print wc.toDebugString()
+	Pyspark> def chag(x):
+			return (x,1)
+	Pyspark> wc = words.map(chag)
+	Pyspark> print wc.toDebugString()
 \end{lstlisting}
 
-这行代码将会把lambda映射到每个单词。因此，每个x都是一个单词，每个单词都会被匿名闭包转换为
+这行代码将会把chag映射到每个单词。因此，每个x都是一个单词，每个单词都会被匿名闭包转换为
 元组(word,
 1)。为了查看转换关系，我们使用toDebugString方法来查看RDD是怎么被转换的。
 
 接下来可以使用reduceByKey动作进行字数统计，然后把统计结果写到磁盘。
 
 \begin{lstlisting}
->>> counts = wc.reduceByKey(add)
->>> counts.saveAsTextFile("wc_result")
+	Pyspark> counts = wc.reduceByKey(add)
+	Pyspark> counts.saveAsTextFile("wc_result")
 \end{lstlisting}
 
-一旦我们最终调用了saveAsTextFile动作，这个分布式作业就开始执行了，在作业``跨集群地''（或者你
+一旦我们最终调用了\texttt{saveAsTextFile}动作，这个分布式应用就开始执行了，在应用“跨集群”（或者你
 本机的很多进程）运行时，你应该可以看到很多INFO语句。如果退出解释器，你可以看到当前工作目录
-下有个``wc\_result''目录。
+下有个“wc\_result”目录。
 
-每个part文件都代表你本机上的进程计算得到的被保持到磁盘上的最终RDD。如果对一个part文件进行
-head命令，你可以看到字数统计元组。注意这些键没有像Hadoop一样被排序（因为Hadoop中Map和
-Reduce任务中有个必要的打乱和排序阶段）。但是，能保证每个单词在所有文件中只出现一次，因为我
+每个part文件都代表你本机上的进程计算得到的被保持到磁盘上的最终RDD。如果对一个part文件运行
+head命令，可以看到字数统计元组。注意这些键没有像Hadoop一样被排序（因为Hadoop中Map和
+Reduce任务中有个必要的打乱和排序阶段），但是，能保证每个单词在所有文件中只出现一次，因为我
 们使用了reduceByKey操作符。
