@@ -1,4 +1,4 @@
-\section{实例分析：FoodMart数据集在Hive平台的使用案例}\label{ux5b9eux4f8bux5206ux6790foodmartux6570ux636eux96c6ux5728hiveux5e73ux53f0ux7684ux4f7fux7528ux6848ux4f8b}
+\section{Hive实例：FoodMart案例}\label{ux5b9eux4f8bux5206ux6790foodmartux6570ux636eux96c6ux5728hiveux5e73ux53f0ux7684ux4f7fux7528ux6848ux4f8b}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -87,21 +87,21 @@ store表维度最小，在此以创建store表为例，首先在FoodMart数据�
 单独对销量表查询排序，代码如下：
 
 \begin{lstlisting}
-	Hive> select customer_id, sum(store_cost) 
-	as cost_total from 
-	sales_fact_1997 group by customer_id sort by cost_total 
+	Hive> select customer_id, sum(store_cost)
+	as cost_total from
+	sales_fact_1997 group by customer_id sort by cost_total
 	DESC limit 3;
 \end{lstlisting}
 
 以查询用户的姓名为例，完整的SQL语句可参考：
 
 \begin{lstlisting}
-	Hive> select b.lname,b.fname,a.cost_total from 
+	Hive> select b.lname,b.fname,a.cost_total from
 	(select customer_id, sum(store_cost) as cost_total from
 	sales_fact_1997 group by customer_id sort by cost_total
-	DESC limit 3 ) a 
-	left outer join 
-	(select customer_id, lname,fname from customer ) b 
+	DESC limit 3 ) a
+	left outer join
+	(select customer_id, lname,fname from customer ) b
 	on a.customer_id=b.customer_id;
 \end{lstlisting}
 

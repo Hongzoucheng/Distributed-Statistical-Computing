@@ -1,4 +1,4 @@
-\section{实例分析：2015年上映电影的聚类分析}\label{ux5b9eux4f8bux5206ux67902015ux5e74ux4e0aux6620ux7535ux5f71ux7684ux805aux7c7bux5206ux6790}
+\section{MapReduce实例：聚类分析}\label{ux5b9eux4f8bux5206ux67902015ux5e74ux4e0aux6620ux7535ux5f71ux7684ux805aux7c7bux5206ux6790}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -120,8 +120,8 @@ Hadoop的MapReduce技术，Mapper主要用于实现读取数据完输入数据�
 受Map的数据后产生键值，以作为每个分组的数值。从K均值聚类的流程来看，我们需要对数据进行标准
 化处理，将处理后的数据变为0--1之间分布的数值，然后再建立模型。
 
-在R版本的Reducer中引入R包e1071，利用\lstinline|kmeans|函数分析数据，将其进行K均值聚类分析。将聚类数目
-设置为4，迭代数目设为20次。
+在R版本的Reducer中引入R包e1071，利用\lstinline|kmeans|函数分析数据，将其进行K均值聚类分析。
+将聚类数目设置为4，迭代数目设为20次。
 
 \begin{lstlisting}
 	#! /usr/bin/env Rscript
@@ -164,7 +164,9 @@ Hadoop的MapReduce技术，Mapper主要用于实现读取数据完输入数据�
 	    return centroids
 \end{lstlisting}
 
-最后定义K均值算法的函数。一开始确定数据集中数据点的总数，然后创建一个矩阵来储存每个点的簇分配结果。簇分类结果有两列。一列记录簇的索引值，第二列储存误差。这里的误差指的是当前点到簇质心的距离。按照此种方式，反复迭代，知道所有数据点的簇分配结果不会改变为止。
+最后定义K均值算法的函数。一开始确定数据集中数据点的总数，然后创建一个矩阵来储存每个点的簇分
+配结果。簇分类结果有两列。一列记录簇的索引值，第二列储存误差。这里的误差指的是当前点到簇质
+心的距离。按照此种方式，反复迭代，知道所有数据点的簇分配结果不会改变为止。
 
 \begin{lstlisting}
 	def kMeans(dataSet, k, distMeas=distEclud,createCent=randCent):
@@ -188,5 +190,3 @@ Hadoop的MapReduce技术，Mapper主要用于实现读取数据完输入数据�
 	                centroids[cent,:] = mean(ptsInClust,axis=0)
 	        return centroids,clusterAssment
 \end{lstlisting}
-
-

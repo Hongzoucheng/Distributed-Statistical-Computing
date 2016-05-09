@@ -1,5 +1,4 @@
-\section{实例分析：Hadoop Streaming 与 Hive
-交互计算实例}\label{ux5b9eux4f8bux5206ux6790hadoop-streaming-ux4e0e-hive-ux4ea4ux4e92ux8ba1ux7b97ux5b9eux4f8b}
+\section{Hive实例：Hive Streaming 交互计算}\label{ux5b9eux4f8bux5206ux6790hadoop-streaming-ux4e0e-hive-ux4ea4ux4e92ux8ba1ux7b97ux5b9eux4f8b}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -15,10 +14,12 @@
 
 \subsection{数据准备}\label{ux6570ux636eux51c6ux5907}
 
-与Hadoop类似，Hive也支持使用JAVA之外的语言编写Streaming程序扩展Hive，实现Hive中的函数无法实现的功能。开发Hive的Streaming程序和开发Hadoop的Streaming程序是相同的，都是从标准输入中读取数据，将结果写出到标准输出中。
-Hive中提供多个语法来使用Streaming，包括\texttt{map()}, \texttt{reduce()}, \texttt{TRANSFORM(
-)}，使用\texttt{TRANSFROM()}的情形较多。
-例如，我们现在需要将表格中的日期字符串转换成季节字符串形式，若现在的日期形式为YYYY-MM-DD，通过变换，希望输出YYYYQ1的季节字符串形式。我们在Hive中创建表格birdata，并载入。测试数据：
+与Hadoop类似，Hive也支持使用JAVA之外的语言编写Streaming程序扩展Hive，实现Hive中的函数无法实
+现的功能。开发Hive的Streaming程序和开发Hadoop的Streaming程序是相同的，都是从标准输入中读取
+数据，将结果写出到标准输出中。Hive中提供多个语法来使用Streaming，包括\texttt{map()},
+\texttt{reduce()}, \texttt{TRANSFORM( )}，使用\texttt{TRANSFROM()}的情形较多。例如，我们现
+在需要将表格中的日期字符串转换成季节字符串形式，若现在的日期形式为YYYY-MM-DD，通过变换，希
+望输出YYYYQ1的季节字符串形式。我们在Hive中创建表格birdata，并载入。测试数据：
 
 \begin{lstlisting}
 AAA    1990-02-01

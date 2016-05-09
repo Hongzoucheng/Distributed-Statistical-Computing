@@ -1,4 +1,4 @@
-\section{实例分析：基于MapReduce的Logistics回归}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8emapreduceux7684logisticsux56deux5f52}
+\section{分块Logistics回归}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8emapreduceux7684logisticsux56deux5f52}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -14,15 +14,12 @@
 
 \subsection{研究思路}\label{ux7814ux7a76ux601dux8def}
 
-Logit模型(Logistic
-model)，是最早的离散选择模型。Logit模型的求解速度快、应用方便，可以对预
+Logit模型(Logistic model)，是最早的离散选择模型。Logit模型的求解速度快、应用方便，可以对预
 测的结果进行比较和检验，在社会学、生物统计学、临床、数量心理学、计量经济学、市场营销等统计
-实证分析中广为应用。本文以R软件中的Orange
-Juice数据为研究对象，通过描述性分析对消费者橙汁
-品牌选择的偏好进行初步分析，继而分别建立了Logit回归模型，对消费数据进行拟合分析。最后在
-MapReduce实践部分，展示了完整的从数据获取到Map函数、Reduce函数以及输出结果的过程。在服务器
-上使用MapRuducer的方法，
-对Logistics回归进行并行计算操作。MapReduce的具体流程如下：
+实证分析中广为应用。本文以R软件中的Orange Juice数据为研究对象，通过描述性分析对消费者橙汁品
+牌选择的偏好进行初步分析，继而分别建立了Logit回归模型，对消费数据进行拟合分析。最后
+在MapReduce实践部分，展示了完整的从数据获取到Map函数、Reduce函数以及输出结果的过程。在服务
+器上使用MapRuducer的方法，对Logistics回归进行并行计算操作。MapReduce的具体流程如下：
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -39,13 +36,16 @@ MapReduce实践部分，展示了完整的从数据获取到Map函数、Reduce�
 \subsection{数据准备}\label{ux6570ux636eux51c6ux5907}
 
 本研究所用样本数据均来自R软件ISLR包中的OJ数据，样本中包含1070个消费者购买Citrus
-Hill 牌或 Minute
-Maid牌橙汁的行为数据。1070个样本数据的18个变量包含Purchase、Store7、StoreID和Store4
-个分类变量，和其余的14个定量变量，用于以下研究分析。
+Hill 牌或 Minute Maid牌橙汁的行为数据。1070个样本数据的18个变量包
+含Purchase、Store7、StoreID和Store4个分类变量，和其余的14个定量变量，用于以下研究分析。
 
 \subsection{建立Logit回归模型}\label{ux5efaux7acblogitux56deux5f52ux6a21ux578b}
 
-将购买（Purchase）作为本文的因变量，将购买``CH''定义为0，``购买MM''定义为1，选取CH售价（PriceCH），MM售价（PriceMM），CH折扣（DiscCH），MM折扣（DiscMM），CH特殊指标（SpecialCH），MM特殊指标（SpecialMM），CH忠诚度（LoyalCH）几个指标作为自变量建立Logit回归模型。MapReduce中首先将数据打乱，随后分成不同的3块，以下分别给出3块回归的结果和最后Reduce后的结果，并和利用全部数据整体进行对比。
+将购买（Purchase）作为本文的因变量，将购买``CH''定义为0，``购买MM''定义为1，选取CH售价
+（PriceCH），MM售价（PriceMM），CH折扣（DiscCH），MM折扣（DiscMM），CH特殊指标
+（SpecialCH），MM特殊指标（SpecialMM），CH忠诚度（LoyalCH）几个指标作为自变量建立Logit回归
+模型。MapReduce中首先将数据打乱，随后分成不同的3块，以下分别给出3块回归的结果和最后Reduce后
+的结果，并和利用全部数据整体进行对比。
 
 \subsubsection{Mapper部分}\label{mapperux90e8ux5206}
 
@@ -150,13 +150,12 @@ Maid牌橙汁的行为数据。1070个样本数据的18个变量包含Purchase�
 
 \subsubsection{实践结论}\label{ux5b9eux8df5ux7ed3ux8bba}
 
-观察Logit全模型的估计结果，可以发现CH标价（PriceCH）、MM标价（PriceMM）、MM折扣（DiscMM）、
-CH品牌忠诚度（LoyalCH）、MM折扣比例（PctDiscMM）对Purchase有显著的影响。一定程度上对
-Purchase有解释作用，而其他变量对因变量解释性并不显著。通过对比MapReduce的结果和利用全部数
-据同时建模的结果可以发现，MapReduce的结果精确度还是比较高的，为了避免是一次实验造成的随机
-性结果，又重复多次进行计算，发现大多数变量的系数依然较为只有``CH特殊指标（SpecialCH）``这一
-个变量的系数有可能出现符号相反的结果，考虑到其系数本身就接近于0，同时并不显著，所以不能改
+观察Logit全模型的估计结果，可以发现CH标价（PriceCH）、MM标价（PriceMM）、MM折扣
+（DiscMM）、CH品牌忠诚度（LoyalCH）、MM折扣比例（PctDiscMM）对Purchase有显著的影响。一定程
+度上对Purchase有解释作用，而其他变量对因变量解释性并不显著。通过对比MapReduce的结果和利用全
+部数据同时建模的结果可以发现，MapReduce的结果精确度还是比较高的，为了避免是一次实验造成的随
+机性结果，又重复多次进行计算，发现大多数变量的系数依然较为只有``CH特殊指标（SpecialCH）``这
+一个变量的系数有可能出现符号相反的结果，考虑到其系数本身就接近于0，同时并不显著，所以不能改
 变我们对最终结果比较精确的判断。在对三个子块进行建模得到的系数进行比较后，发现不同子块之间
-的个别变量的系数差别还是比较大的，例如``CH价格（PriceCH）''三次得到结果分别是6.28，1.44和
-4.39，这可能与数据的分布有关系，但是不影响最终Reduce的效果。
-
+的个别变量的系数差别还是比较大的，例如``CH价格（PriceCH）''三次得到结果分别
+是6.28，1.44和4.39，这可能与数据的分布有关系，但是不影响最终Reduce的效果。

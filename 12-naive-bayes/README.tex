@@ -1,4 +1,4 @@
-\section{实例分析：基于MapReduce的朴素贝叶斯模型}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8emapreduceux7684ux6734ux7d20ux8d1dux53f6ux65afux6a21ux578b}
+\section{朴素贝叶斯模型}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8emapreduceux7684ux6734ux7d20ux8d1dux53f6ux65afux6a21ux578b}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -103,7 +103,7 @@ sf。每个城市数据中，entries部分的summary对应的文本是本案例�
 
 	docList=[]
 	fullText =[]
-	
+
 	def bagOfWords2VecMN(vocabList, inputSet):
 	    returnVec = [0]*len(vocabList)
 	    for word in inputSet:
@@ -161,7 +161,7 @@ sf。每个城市数据中，entries部分的summary对应的文本是本案例�
 
 	vocabList = createVocabList(docList)
 
-	classList = 
+	classList =
 	    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
@@ -225,4 +225,3 @@ sf。每个城市数据中，entries部分的summary对应的文本是本案例�
 \item
   查看执行结果。执行结果均被保存在名为part-00000的文件中，并存放于\lstinline|-output|所指定的路径下。
 \end{itemize}
-

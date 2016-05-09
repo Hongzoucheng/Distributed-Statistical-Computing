@@ -1,4 +1,4 @@
-\section{实例分析：随机森林的并行实现}\label{ux5b9eux4f8bux5206ux6790ux968fux673aux68eeux6797ux7684ux5e76ux884cux5b9eux73b0}
+\section{Mahout实例：随机森林的分布式实现}\label{ux5b9eux4f8bux5206ux6790ux968fux673aux68eeux6797ux7684ux5e76ux884cux5b9eux73b0}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -90,14 +90,12 @@ testData 中。这里需要注 意的是，直接调用 Mahout
 	-d 10 N L
 \end{lstlisting}
 
-这里，\$MAHOUT\_HOME 代表\texttt{/home/dmc/mahout}，参数 \lstinline|-p| 表示输入文件，\lstinline|-f|
-表示输出文件；在 Hadoop 平台 上调用 Mahout，输入输出均为 HDFS 文件系统中
-的数据。\lstinline|-d| 表示要描述的数据集的变量信息，其后的 字符串``10 N
-L''表示从左到 右依次是 10
-个数值型变量，最后的``L''表示要分类的变量。这里还可以输入``C''
-表示分类型变量(本例中没有分类型)。成功执行后，文件系统中 pkuzcy
-路径下会出现 train.info 的文件。使用 \lstinline|cat| 命 令查看该路径下所有的 info
-文件。
+这里，\path{$MAHOUT_HOME} 代表\texttt{/home/dmc/mahout}，参数 \lstinline|-p| 表示输入文
+件，\lstinline|-f|表示输出文件；在 Hadoop 平台 上调用 Mahout，输入输出均为 HDFS 文件系统中
+的数据。\lstinline|-d| 表示要描述的数据集的变量信息，其后的 字符串``10 N L''表示从左到 右依
+次是 10个数值型变量，最后的``L''表示要分类的变量。这里还可以输入``C''表示分类型变量(本例中
+没有分类型)。成功执行后，文件系统中 pkuzcy路径下会出现 train.info 的文件。使
+用 \lstinline|cat| 命 令查看该路径下所有的 info文件。
 
 \begin{lstlisting}
 	$ hadoop fs -cat pkuzcy/*.info
@@ -250,4 +248,3 @@ Mahout 与 Spark 语句，用 于建立模型的训练集与
 测试集是分别划分的，这对于模型的结果也有很大影响。此外，需要注意的
 是，Spark 运行的时间明显比在 Hadoop 之上 Mahout 实现
 的运行时间短很多，这体现了 Spark 的优势。
-

@@ -1,4 +1,4 @@
-\section{实例分析：基于判别分析的气象因素对雾霾的影响}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8eux5224ux522bux5206ux6790ux7684ux6c14ux8c61ux56e0ux7d20ux5bf9ux96feux973eux7684ux5f71ux54cd}
+\section{判别分析:气象因素对雾霾影响分析}\label{ux5b9eux4f8bux5206ux6790ux57faux4e8eux5224ux522bux5206ux6790ux7684ux6c14ux8c61ux56e0ux7d20ux5bf9ux96feux973eux7684ux5f71ux54cd}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -63,7 +63,7 @@ prerank。
 	options(warn=-1)
 	sink("/dev/null")
 	input<-file("stdin","r")
-	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)   
+	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)
 	{
 	    fields<-unlist(strsplit(currentLine, ","))
 	    data<-sum(as.numeric(fields))
@@ -84,7 +84,7 @@ prerank。
 	sink("/dev/null")
 	input <- file("stdin","r")
 	data <- 0
-	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)   
+	while(length(currentLine<-readLines(input, n=1, warn=FALSE)) > 0)
 	{
 	    fields <- unlist(strsplit(currentLine, "\t"))
 	    data <- data+as.numeric(fields)

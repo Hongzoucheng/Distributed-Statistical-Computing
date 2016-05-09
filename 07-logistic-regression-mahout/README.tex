@@ -1,5 +1,4 @@
-\section{实例分析：Mahout
-机器学习研究红酒质量影响因素}\label{ux5b9eux4f8bux5206ux6790mahout-ux673aux5668ux5b66ux4e60ux7814ux7a76ux7ea2ux9152ux8d28ux91cfux5f71ux54cdux56e0ux7d20}
+\section{Mahout实例：Logistics回归和随机森林分类算法}\label{ux5b9eux4f8bux5206ux6790mahout-ux673aux5668ux5b66ux4e60ux7814ux7a76ux7ea2ux9152ux8d28ux91cfux5f71ux54cdux56e0ux7d20}
 
 \subsection{准备知识}\label{ux51c6ux5907ux77e5ux8bc6}
 
@@ -15,23 +14,20 @@
 
 \subsection{研究背景}\label{ux7814ux7a76ux80ccux666f}
 
-本案例主要使用 Hadoop 和 Mahout 的机器学习算法对实际数据完成分类问题的学
-习。为了实践机器 学习算法，使用 UCI
-机器学习库的红酒质量数据集，学习的内容为根据红酒的一些属性判断红酒质量水
-平。在这里使用的分类方法为 Logistic 回归、随机森林。从 Logistic
-回归得到的结果发现酒精浓 度、密度、糖分量等和红酒质量是正相关的，氯化
-钠含量、柠檬酸含量、挥发性酸含量等和红酒质量是 负相关的。
-通过随机森林的学习，我
-们依据红酒属性得到对红酒质量的判断可以达到很高的准确性。
+本案例主要使用 Hadoop 和 Mahout 的机器学习算法对实际数据完成分类问题的学习。为了实践机器 学
+习算法，使用 UCI机器学习库的红酒质量数据集，学习的内容为根据红酒的一些属性判断红酒质量水平。
+在这里使用的分类方法为 Logistic 回归、随机森林。从 Logistic回归得到的结果发现酒精浓 度、密
+度、糖分量等和红酒质量是正相关的，氯化钠含量、柠檬酸含量、挥发性酸含量等和红酒质量是 负相关
+的。通过随机森林的学习，我们依据红酒属性得到对红酒质量的判断可以达到很高的准确性。
 
 \subsection{数据准备}\label{ux6570ux636eux51c6ux5907}
 
 \subsubsection{数据信息}\label{ux6570ux636eux4fe1ux606f}
 
 本次报告分析的数据集来自UCI机器学习数据库的红酒质量数据集（网
-址:\href{http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/}{\lstinline|http://archive.ics.uci.edu/ml/machine-learning-databases/wine-      quality/|}）。
-该数据集包含 1599 个样本，13 个变量，其中 1 个变量为样本序号、11
-个变量为红酒的一些属性数值描述、1 个变量为该红酒样本的质量评分。
+址:\path{http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/}）。该数据
+集包含 1599 个样本，13 个变量，其中 1 个变量为样本序号、11个变量为红酒的一些属性数值描
+述、1 个变量为该红酒样本的质量评分。
 
 \subsubsection{数据预处理}\label{ux6570ux636eux9884ux5904ux7406}
 
@@ -181,7 +177,7 @@ redwine\_test.arff 放入 HDFS 中，代码如下：
 Mahout 中的 Describe 工具创建变量信息 文件，代码如下：
 
 \begin{lstlisting}
-	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \ 
+	$ hadoop jar $MAHOUT_HOME/mahout-examples-0.10.1-job.jar \
 	org.apache.mahout.classifier.df.tools.Describe \
 	-p redwine_train.arff \
 	-f redwine_train.info \
@@ -271,9 +267,7 @@ $ hadoop fs -cat redwine_train.info
   \lstinline!-a! 要求输出混淆矩阵
 \end{itemize}
 
-得到的随机森林模型测试输出结果可以看到随机森林的正确率高达 98.33\%。
-Logistic 模型的测试结果 的混淆矩阵，随机森林模型的准确性十分高。虽
-然随机森林的判断结果准确性更高，但是模型解释性相 较 Logistic
-回归模型较差，我们没
-有办法通过输出的结果说明红酒的各个属性变量在判断红酒质量方 面的贡献。
-
+得到的随机森林模型测试输出结果可以看到随机森林的正确率高达 98.33\%。Logistic 模型的测试结
+果 的混淆矩阵，随机森林模型的准确性十分高。虽然随机森林的判断结果准确性更高，但是模型解释性
+相 较 Logistic回归模型较差，我们没有办法通过输出的结果说明红酒的各个属性变量在判断红酒质量
+方 面的贡献。
